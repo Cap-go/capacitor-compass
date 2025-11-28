@@ -9,7 +9,7 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 @CapacitorPlugin(name = "CapgoCompass")
 public class CapgoCompassPlugin extends Plugin {
 
-    private final String pluginVersion = "7.0.0";
+    private final String pluginVersion = "7.1.0";
     private CapgoCompass implementation;
     private boolean isListening = false;
 
