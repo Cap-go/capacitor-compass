@@ -1,0 +1,10 @@
+{
+  "appId": "app.capgo.compass",
+  "appName": "Compass Example",
+  "webDir": "dist",
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false
+    }
+  }
+}
