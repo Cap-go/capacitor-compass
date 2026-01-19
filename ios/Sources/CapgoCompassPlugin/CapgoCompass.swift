@@ -9,10 +9,18 @@ import os.log
     private var lastTrueHeading: Double = -1.0
     private var headingCallback: ((Double) -> Void)?
     private var permissionCallback: (() -> Void)?
+    
+    // Throttling state
+    private var lastReportedHeading: Double = -1.0
+    private var lastReportedTime: TimeInterval = 0
+    private var minHeadingChange: Double = 2.0
+    private var minInterval: TimeInterval = 0.1 // 100ms in seconds
 
     @objc override public init() {
         super.init()
         locationManager.delegate = self
+        // Set built-in heading filter to reduce native event frequency
+        locationManager.headingFilter = 1.0
     }
 
     @objc public func requestPermission(completion: @escaping () -> Void) {
@@ -30,7 +38,12 @@ import os.log
 
     @objc public func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         self.lastTrueHeading = newHeading.trueHeading
-        headingCallback?(newHeading.trueHeading)
+        
+        if shouldReportHeading(newHeading.trueHeading) {
+            lastReportedHeading = newHeading.trueHeading
+            lastReportedTime = Date().timeIntervalSince1970
+            headingCallback?(newHeading.trueHeading)
+        }
     }
 
     @objc public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
@@ -57,6 +70,34 @@ import os.log
 
     @objc public func setHeadingCallback(_ callback: ((Double) -> Void)?) {
         self.headingCallback = callback
+    }
+    
+    @objc public func setThrottlingOptions(minHeadingChange: Double, minInterval: Double) {
+        self.minHeadingChange = minHeadingChange
+        self.minInterval = minInterval / 1000.0 // Convert ms to seconds
+    }
+    
+    private func shouldReportHeading(_ heading: Double) -> Bool {
+        let currentTime = Date().timeIntervalSince1970
+        
+        // Time-based throttling
+        if currentTime - lastReportedTime < minInterval {
+            return false
+        }
+        
+        // Change-based throttling
+        if lastReportedHeading >= 0 {
+            var headingDelta = abs(heading - lastReportedHeading)
+            // Handle wraparound (e.g., 359° -> 1° should be 2° difference, not 358°)
+            if headingDelta > 180 {
+                headingDelta = 360 - headingDelta
+            }
+            if headingDelta < minHeadingChange {
+                return false
+            }
+        }
+        
+        return true
     }
 
     public func getAuthorizationStatus() -> CLAuthorizationStatus {

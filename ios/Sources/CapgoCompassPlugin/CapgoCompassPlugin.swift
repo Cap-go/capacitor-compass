@@ -64,6 +64,13 @@ public class CapgoCompassPlugin: CAPPlugin, CAPBridgedPlugin {
             return
         }
 
+        // Parse options with defaults
+        let minHeadingChange = call.getDouble("minHeadingChange", 2.0)
+        let minInterval = call.getDouble("minInterval", 100.0)
+        
+        // Apply throttling options
+        implementation.setThrottlingOptions(minHeadingChange: minHeadingChange, minInterval: minInterval)
+
         isListening = true
         implementation.setHeadingCallback { [weak self] heading in
             guard let self = self else { return }

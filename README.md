@@ -75,7 +75,7 @@ await handle.remove();
 
 * [`getCurrentHeading()`](#getcurrentheading)
 * [`getPluginVersion()`](#getpluginversion)
-* [`startListening()`](#startlistening)
+* [`startListening(...)`](#startlistening)
 * [`stopListening()`](#stoplistening)
 * [`addListener('headingChange', ...)`](#addlistenerheadingchange-)
 * [`removeAllListeners()`](#removealllisteners)
@@ -124,14 +124,18 @@ Get the native Capacitor plugin version.
 --------------------
 
 
-### startListening()
+### startListening(...)
 
 ```typescript
-startListening() => Promise<void>
+startListening(options?: ListeningOptions | undefined) => Promise<void>
 ```
 
 Start listening for compass heading changes via events.
 This starts the compass sensors and emits 'headingChange' events.
+
+| Param         | Type                                                          | Description                                   |
+| ------------- | ------------------------------------------------------------- | --------------------------------------------- |
+| **`options`** | <code><a href="#listeningoptions">ListeningOptions</a></code> | - Optional configuration for event throttling |
 
 **Since:** 7.0.0
 
@@ -229,6 +233,16 @@ Result containing the compass heading value.
 | Prop        | Type                | Description                        |
 | ----------- | ------------------- | ---------------------------------- |
 | **`value`** | <code>number</code> | Compass heading in degrees (0-360) |
+
+
+#### ListeningOptions
+
+Options for configuring compass event listening behavior.
+
+| Prop                   | Type                | Description                                                                                                                                                   | Default          | Since |
+| ---------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ----- |
+| **`minInterval`**      | <code>number</code> | Minimum interval between events in milliseconds. Events will be throttled to not fire more frequently than this interval. Default: 100ms (max 10 events/sec). | <code>100</code> | 8.2.0 |
+| **`minHeadingChange`** | <code>number</code> | Minimum heading change in degrees to trigger an event. Events will only fire if the heading has changed by at least this amount. Default: 2.0 degrees.        | <code>2.0</code> | 8.2.0 |
 
 
 #### HeadingChangeEvent

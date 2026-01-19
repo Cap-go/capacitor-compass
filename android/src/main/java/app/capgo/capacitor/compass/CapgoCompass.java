@@ -5,6 +5,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
@@ -13,6 +16,9 @@ import androidx.appcompat.app.AppCompatActivity;
 public class CapgoCompass implements SensorEventListener {
 
     private static final String TAG = "CapgoCompass";
+    private static final float DEFAULT_MIN_HEADING_CHANGE = 2.0f;
+    private static final long DEFAULT_MIN_INTERVAL_MS = 100;
+
     private AppCompatActivity activity;
     private SensorManager sensorManager;
     private Sensor magnetometer;
@@ -20,6 +26,17 @@ public class CapgoCompass implements SensorEventListener {
     private float[] gravityValues = new float[3];
     private float[] magneticValues = new float[3];
     private HeadingCallback headingCallback;
+    
+    // Throttling state
+    private float lastReportedHeading = -1f;
+    private long lastReportedTime = 0;
+    private float minHeadingChange = DEFAULT_MIN_HEADING_CHANGE;
+    private long minIntervalMs = DEFAULT_MIN_INTERVAL_MS;
+    
+    // Background thread for sensor processing
+    private HandlerThread sensorThread;
+    private Handler sensorHandler;
+    private Handler mainHandler;
 
     public interface HeadingCallback {
         void onHeadingChanged(float heading);
@@ -31,6 +48,7 @@ public class CapgoCompass implements SensorEventListener {
         this.sensorManager = (SensorManager) activity.getSystemService(Context.SENSOR_SERVICE);
         this.magnetometer = this.sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         this.accelerometer = this.sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        this.mainHandler = new Handler(Looper.getMainLooper());
 
         Log.d(TAG, "SensorManager: " + (this.sensorManager != null) + " Magnetometer: " + (this.magnetometer != null));
 
@@ -47,17 +65,36 @@ public class CapgoCompass implements SensorEventListener {
         this.headingCallback = callback;
     }
 
+    public void setThrottlingOptions(float minHeadingChange, long minIntervalMs) {
+        this.minHeadingChange = minHeadingChange;
+        this.minIntervalMs = minIntervalMs;
+    }
+
     public void registerListeners() {
+        // Create background thread for sensor processing
+        if (sensorThread == null) {
+            sensorThread = new HandlerThread("CompassSensorThread");
+            sensorThread.start();
+            sensorHandler = new Handler(sensorThread.getLooper());
+        }
+
         if (this.magnetometer != null) {
-            this.sensorManager.registerListener(this, this.magnetometer, SensorManager.SENSOR_DELAY_NORMAL);
+            this.sensorManager.registerListener(this, this.magnetometer, SensorManager.SENSOR_DELAY_NORMAL, sensorHandler);
         }
         if (this.accelerometer != null) {
-            this.sensorManager.registerListener(this, this.accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+            this.sensorManager.registerListener(this, this.accelerometer, SensorManager.SENSOR_DELAY_NORMAL, sensorHandler);
         }
     }
 
     public void unregisterListeners() {
         this.sensorManager.unregisterListener(this);
+        
+        // Clean up background thread
+        if (sensorThread != null) {
+            sensorThread.quitSafely();
+            sensorThread = null;
+            sensorHandler = null;
+        }
     }
 
     private DisplayRotation getDisplayRotation() {
@@ -117,8 +154,30 @@ public class CapgoCompass implements SensorEventListener {
 
         float normalized = (bearing + 360.0f) % 360.0f;
 
-        Log.d(TAG, "Bearing: " + normalized);
         return normalized;
+    }
+
+    private boolean shouldReportHeading(float heading) {
+        long currentTime = System.currentTimeMillis();
+        
+        // Time-based throttling
+        if (currentTime - lastReportedTime < minIntervalMs) {
+            return false;
+        }
+        
+        // Change-based throttling
+        if (lastReportedHeading >= 0) {
+            float headingDelta = Math.abs(heading - lastReportedHeading);
+            // Handle wraparound (e.g., 359° -> 1° should be 2° difference, not 358°)
+            if (headingDelta > 180) {
+                headingDelta = 360 - headingDelta;
+            }
+            if (headingDelta < minHeadingChange) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     @Override
@@ -131,7 +190,14 @@ public class CapgoCompass implements SensorEventListener {
 
         if (headingCallback != null) {
             float heading = calculateCurrentHeading();
-            headingCallback.onHeadingChanged(heading);
+            
+            if (shouldReportHeading(heading)) {
+                lastReportedHeading = heading;
+                lastReportedTime = System.currentTimeMillis();
+                
+                // Post to main thread for WebView bridge
+                mainHandler.post(() -> headingCallback.onHeadingChanged(heading));
+            }
         }
     }
 

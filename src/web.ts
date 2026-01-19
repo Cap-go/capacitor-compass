@@ -1,6 +1,6 @@
 import { WebPlugin } from '@capacitor/core';
 
-import type { CapgoCompassPlugin, CompassHeading, HeadingChangeEvent, PermissionStatus } from './definitions';
+import type { CapgoCompassPlugin, CompassHeading, HeadingChangeEvent, ListeningOptions, PermissionStatus } from './definitions';
 
 export class CapgoCompassWeb extends WebPlugin implements CapgoCompassPlugin {
   async getCurrentHeading(): Promise<CompassHeading> {
@@ -11,7 +11,7 @@ export class CapgoCompassWeb extends WebPlugin implements CapgoCompassPlugin {
     return { version: 'web' };
   }
 
-  async startListening(): Promise<void> {
+  async startListening(_options?: ListeningOptions): Promise<void> {
     throw this.unavailable('Compass not available on web');
   }
 

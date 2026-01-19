@@ -42,6 +42,33 @@ export interface PermissionStatus {
 }
 
 /**
+ * Options for configuring compass event listening behavior.
+ *
+ * @since 8.2.0
+ */
+export interface ListeningOptions {
+  /**
+   * Minimum interval between events in milliseconds.
+   * Events will be throttled to not fire more frequently than this interval.
+   * Default: 100ms (max 10 events/sec).
+   *
+   * @since 8.2.0
+   * @default 100
+   */
+  minInterval?: number;
+
+  /**
+   * Minimum heading change in degrees to trigger an event.
+   * Events will only fire if the heading has changed by at least this amount.
+   * Default: 2.0 degrees.
+   *
+   * @since 8.2.0
+   * @default 2.0
+   */
+  minHeadingChange?: number;
+}
+
+/**
  * Capacitor Compass Plugin interface for reading device compass heading.
  *
  * @since 7.0.0
@@ -82,17 +109,31 @@ export interface CapgoCompassPlugin {
    * Start listening for compass heading changes via events.
    * This starts the compass sensors and emits 'headingChange' events.
    *
+   * @param options - Optional configuration for event throttling
    * @returns Promise that resolves when listening starts
    * @since 7.0.0
    * @example
    * ```typescript
+   * // Use defaults (100ms interval, 2° change threshold)
    * await CapgoCompass.startListening();
    * CapgoCompass.addListener('headingChange', (event) => {
    *   console.log('Heading:', event.value);
    * });
+   * 
+   * // Custom throttling for high-frequency updates (AR/gaming)
+   * await CapgoCompass.startListening({
+   *   minInterval: 50,
+   *   minHeadingChange: 1.0
+   * });
+   * 
+   * // Battery-saving mode for navigation
+   * await CapgoCompass.startListening({
+   *   minInterval: 200,
+   *   minHeadingChange: 5.0
+   * });
    * ```
    */
-  startListening(): Promise<void>;
+  startListening(options?: ListeningOptions): Promise<void>;
 
   /**
    * Stop listening for compass heading changes.
