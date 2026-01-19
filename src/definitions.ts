@@ -19,6 +19,32 @@ export interface HeadingChangeEvent {
 }
 
 /**
+ * Options for configuring compass listening behavior.
+ *
+ * @since 8.1.4
+ */
+export interface ListeningOptions {
+  /**
+   * Minimum interval between heading change events in milliseconds.
+   * Lower values = more frequent updates but higher CPU/battery usage.
+   *
+   * @default 100
+   * @since 8.1.4
+   */
+  minInterval?: number;
+
+  /**
+   * Minimum heading change in degrees required to trigger an event.
+   * Lower values = more sensitive but more events.
+   * Handles wraparound (e.g., 359° to 1° = 2° change).
+   *
+   * @default 2.0
+   * @since 8.1.4
+   */
+  minHeadingChange?: number;
+}
+
+/**
  * Permission state for compass access.
  *
  * @since 7.0.0
@@ -82,17 +108,26 @@ export interface CapgoCompassPlugin {
    * Start listening for compass heading changes via events.
    * This starts the compass sensors and emits 'headingChange' events.
    *
+   * @param options - Optional configuration for throttling behavior
    * @returns Promise that resolves when listening starts
    * @since 7.0.0
    * @example
    * ```typescript
+   * // With default throttling (100ms interval, 2° minimum change)
    * await CapgoCompass.startListening();
+   *
+   * // With custom throttling for high-frequency updates
+   * await CapgoCompass.startListening({
+   *   minInterval: 50,      // 50ms between events
+   *   minHeadingChange: 1.0 // 1° minimum change
+   * });
+   *
    * CapgoCompass.addListener('headingChange', (event) => {
    *   console.log('Heading:', event.value);
    * });
    * ```
    */
-  startListening(): Promise<void>;
+  startListening(options?: ListeningOptions): Promise<void>;
 
   /**
    * Stop listening for compass heading changes.

@@ -8,7 +8,7 @@ import Capacitor
  */
 @objc(CapgoCompassPlugin)
 public class CapgoCompassPlugin: CAPPlugin, CAPBridgedPlugin {
-    private let pluginVersion: String = "8.1.3"
+    private let pluginVersion: String = "7.1.1"
     public let identifier = "CapgoCompassPlugin"
     public let jsName = "CapgoCompass"
     public let pluginMethods: [CAPPluginMethod] = [
@@ -62,6 +62,16 @@ public class CapgoCompassPlugin: CAPPlugin, CAPBridgedPlugin {
         if isListening {
             call.resolve()
             return
+        }
+
+        // Parse optional throttling configuration
+        let minInterval = call.getInt("minInterval")
+        let minHeadingChange = call.getDouble("minHeadingChange")
+        
+        if minInterval != nil || minHeadingChange != nil {
+            let intervalMs = minInterval ?? 100
+            let headingChange = minHeadingChange ?? 2.0
+            implementation.setThrottling(minIntervalMs: intervalMs, minHeadingChange: headingChange)
         }
 
         isListening = true
