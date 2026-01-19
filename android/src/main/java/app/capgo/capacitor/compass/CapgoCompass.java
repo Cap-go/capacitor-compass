@@ -64,10 +64,10 @@ public class CapgoCompass implements SensorEventListener {
     private DisplayRotation getDisplayRotation() {
         Display display;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // Android 11 (API 30) and above
+            // Android 11+ (API 30+)
             display = activity.getDisplay();
         } else {
-            // Android 10 (API 29) and below
+            // Android 10 and below (API 29-)
             display = activity.getWindowManager().getDefaultDisplay();
         }
         
