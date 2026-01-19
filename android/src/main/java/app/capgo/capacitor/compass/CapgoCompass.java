@@ -5,6 +5,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
@@ -61,7 +62,19 @@ public class CapgoCompass implements SensorEventListener {
     }
 
     private DisplayRotation getDisplayRotation() {
-        Display display = activity.getWindowManager().getDefaultDisplay();
+        Display display;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Android 11 (API 30) and above
+            display = activity.getDisplay();
+        } else {
+            // Android 10 (API 29) and below
+            display = activity.getWindowManager().getDefaultDisplay();
+        }
+        
+        if (display == null) {
+            return DisplayRotation.ROTATION_0;
+        }
+        
         int rotation = display.getRotation();
         switch (rotation) {
             case Surface.ROTATION_90:
