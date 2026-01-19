@@ -1,6 +1,6 @@
 {
   "name": "@natural-apptitude/capacitor-compass",
-  "version": "8.1.4",
+  "version": "8.1.5",
   "description": "Native compass heading plugin for Capacitor",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -13,7 +13,7 @@
     "ios/Sources",
     "ios/Tests",
     "Package.swift",
-    "CapgoCapacitorCompass.podspec"
+    "NaturalApptitudeCapacitorCompass.podspec"
   ],
   "author": "Martin Donadieu <martin@capgo.app>",
   "license": "MPL-2.0",
