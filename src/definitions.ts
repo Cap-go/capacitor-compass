@@ -119,13 +119,13 @@ export interface CapgoCompassPlugin {
    * CapgoCompass.addListener('headingChange', (event) => {
    *   console.log('Heading:', event.value);
    * });
-   * 
+   *
    * // Custom throttling for high-frequency updates (AR/gaming)
    * await CapgoCompass.startListening({
    *   minInterval: 50,
    *   minHeadingChange: 1.0
    * });
-   * 
+   *
    * // Battery-saving mode for navigation
    * await CapgoCompass.startListening({
    *   minInterval: 200,

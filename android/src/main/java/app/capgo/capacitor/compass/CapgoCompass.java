@@ -26,13 +26,13 @@ public class CapgoCompass implements SensorEventListener {
     private float[] gravityValues = new float[3];
     private float[] magneticValues = new float[3];
     private HeadingCallback headingCallback;
-    
+
     // Throttling state
     private float lastReportedHeading = -1f;
     private long lastReportedTime = 0;
     private float minHeadingChange = DEFAULT_MIN_HEADING_CHANGE;
     private long minIntervalMs = DEFAULT_MIN_INTERVAL_MS;
-    
+
     // Background thread for sensor processing
     private HandlerThread sensorThread;
     private Handler sensorHandler;
@@ -88,7 +88,7 @@ public class CapgoCompass implements SensorEventListener {
 
     public void unregisterListeners() {
         this.sensorManager.unregisterListener(this);
-        
+
         // Clean up background thread
         if (sensorThread != null) {
             sensorThread.quitSafely();
@@ -159,12 +159,12 @@ public class CapgoCompass implements SensorEventListener {
 
     private boolean shouldReportHeading(float heading) {
         long currentTime = System.currentTimeMillis();
-        
+
         // Time-based throttling
         if (currentTime - lastReportedTime < minIntervalMs) {
             return false;
         }
-        
+
         // Change-based throttling
         if (lastReportedHeading >= 0) {
             float headingDelta = Math.abs(heading - lastReportedHeading);
@@ -176,7 +176,7 @@ public class CapgoCompass implements SensorEventListener {
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -190,11 +190,11 @@ public class CapgoCompass implements SensorEventListener {
 
         if (headingCallback != null) {
             float heading = calculateCurrentHeading();
-            
+
             if (shouldReportHeading(heading)) {
                 lastReportedHeading = heading;
                 lastReportedTime = System.currentTimeMillis();
-                
+
                 // Post to main thread for WebView bridge
                 mainHandler.post(() -> headingCallback.onHeadingChanged(heading));
             }

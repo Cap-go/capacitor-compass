@@ -1,6 +1,12 @@
 import { WebPlugin } from '@capacitor/core';
 
-import type { CapgoCompassPlugin, CompassHeading, HeadingChangeEvent, ListeningOptions, PermissionStatus } from './definitions';
+import type {
+  CapgoCompassPlugin,
+  CompassHeading,
+  HeadingChangeEvent,
+  ListeningOptions,
+  PermissionStatus,
+} from './definitions';
 
 export class CapgoCompassWeb extends WebPlugin implements CapgoCompassPlugin {
   async getCurrentHeading(): Promise<CompassHeading> {

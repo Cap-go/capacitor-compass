@@ -62,7 +62,7 @@ public class CapgoCompassPlugin extends Plugin {
         // Parse options
         float minHeadingChange = call.getFloat("minHeadingChange", 2.0f);
         long minInterval = call.getLong("minInterval", 100L);
-        
+
         // Apply throttling options
         implementation.setThrottlingOptions(minHeadingChange, minInterval);
 
