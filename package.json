@@ -1,5 +1,5 @@
 {
-  "name": "@capgo/capacitor-compass",
+  "name": "@natural-apptitude/capacitor-compass",
   "version": "8.1.4",
   "description": "Native compass heading plugin for Capacitor",
   "main": "dist/plugin.cjs.js",
