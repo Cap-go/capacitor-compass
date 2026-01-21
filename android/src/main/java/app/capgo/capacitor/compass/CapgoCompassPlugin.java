@@ -59,6 +59,14 @@ public class CapgoCompassPlugin extends Plugin {
             return;
         }
 
+        // Parse optional throttling configuration
+        Integer minInterval = call.getInt("minInterval");
+        Double minHeadingChange = call.getDouble("minHeadingChange");
+
+        long intervalMs = minInterval != null ? minInterval.longValue() : 100L;
+        float headingChange = minHeadingChange != null ? minHeadingChange.floatValue() : 2.0f;
+        implementation.setThrottling(intervalMs, headingChange);
+
         isListening = true;
         implementation.setHeadingCallback((heading) -> {
             JSObject ret = new JSObject();
