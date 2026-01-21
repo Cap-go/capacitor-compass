@@ -161,12 +161,10 @@ public class CapgoCompass implements SensorEventListener {
         return normalized;
     }
 
-    private boolean shouldReportHeading(float heading) {
-        long currentTime = System.currentTimeMillis();
-
+    private long shouldReportHeading(float heading, long currentTime) {
         // Time-based throttling
         if (currentTime - lastReportedTime < minIntervalMs) {
-            return false;
+            return -1;
         }
 
         // Change-based throttling
@@ -177,11 +175,11 @@ public class CapgoCompass implements SensorEventListener {
                 headingDelta = 360 - headingDelta;
             }
             if (headingDelta < minHeadingChange) {
-                return false;
+                return -1;
             }
         }
 
-        return true;
+        return currentTime;
     }
 
     @Override
@@ -201,9 +199,10 @@ public class CapgoCompass implements SensorEventListener {
 
             float heading = calculateCurrentHeading();
 
-            if (shouldReportHeading(heading)) {
+            long reportTime = shouldReportHeading(heading, currentTime);
+            if (reportTime >= 0) {
                 lastReportedHeading = heading;
-                lastReportedTime = System.currentTimeMillis();
+                lastReportedTime = reportTime;
 
                 // Post to main thread for WebView bridge
                 mainHandler.post(() -> headingCallback.onHeadingChanged(heading));

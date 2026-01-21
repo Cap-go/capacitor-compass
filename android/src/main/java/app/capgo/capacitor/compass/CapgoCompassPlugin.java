@@ -69,8 +69,8 @@ public class CapgoCompassPlugin extends Plugin {
             return;
         }
 
-        if (minInterval < 0L) {
-            call.reject("Invalid minInterval: value must be greater than or equal to 0");
+        if (minInterval <= 0L) {
+            call.reject("Invalid minInterval: value must be greater than 0");
             return;
         }
 
