@@ -8,7 +8,7 @@ import Capacitor
  */
 @objc(CapgoCompassPlugin)
 public class CapgoCompassPlugin: CAPPlugin, CAPBridgedPlugin {
-    private let pluginVersion: String = "8.1.3"
+    private let pluginVersion: String = "8.1.4"
     public let identifier = "CapgoCompassPlugin"
     public let jsName = "CapgoCompass"
     public let pluginMethods: [CAPPluginMethod] = [
