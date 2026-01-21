@@ -135,7 +135,7 @@ This starts the compass sensors and emits 'headingChange' events.
 
 | Param         | Type                                                          | Description                                      |
 | ------------- | ------------------------------------------------------------- | ------------------------------------------------ |
-| **`options`** | <code><a href="#listeningoptions">ListeningOptions</a></code> | Optional configuration for throttling behavior |
+| **`options`** | <code><a href="#listeningoptions">ListeningOptions</a></code> | - Optional configuration for throttling behavior |
 
 **Since:** 7.0.0
 
