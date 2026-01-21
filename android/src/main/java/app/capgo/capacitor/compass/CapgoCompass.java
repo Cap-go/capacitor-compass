@@ -15,15 +15,15 @@ import androidx.appcompat.app.AppCompatActivity;
 public class CapgoCompass implements SensorEventListener {
 
     private static final String TAG = "CapgoCompass";
-    
+
     // Default throttling constants
     private static final long DEFAULT_MIN_INTERVAL_MS = 100; // Max 10 events/sec
     private static final float DEFAULT_MIN_HEADING_CHANGE = 2.0f; // Minimum 2° change
-    
+
     // Configurable throttling values
     private long minIntervalMs = DEFAULT_MIN_INTERVAL_MS;
     private float minHeadingChange = DEFAULT_MIN_HEADING_CHANGE;
-    
+
     private AppCompatActivity activity;
     private SensorManager sensorManager;
     private Sensor magnetometer;
@@ -31,11 +31,11 @@ public class CapgoCompass implements SensorEventListener {
     private float[] gravityValues = new float[3];
     private float[] magneticValues = new float[3];
     private HeadingCallback headingCallback;
-    
+
     // Background thread for sensor processing
     private HandlerThread sensorThread;
     private Handler sensorHandler;
-    
+
     // Throttling state
     private volatile long lastNotifyTime = 0;
     private volatile float lastNotifiedHeading = -1;
@@ -65,7 +65,7 @@ public class CapgoCompass implements SensorEventListener {
     public void setHeadingCallback(HeadingCallback callback) {
         this.headingCallback = callback;
     }
-    
+
     /**
      * Configure throttling parameters.
      * @param minIntervalMs Minimum interval between events in milliseconds (default: 100)
@@ -81,11 +81,11 @@ public class CapgoCompass implements SensorEventListener {
         sensorThread = new HandlerThread("CompassSensorThread");
         sensorThread.start();
         sensorHandler = new Handler(sensorThread.getLooper());
-        
+
         // Reset throttling state
         lastNotifyTime = 0;
         lastNotifiedHeading = -1;
-        
+
         if (this.magnetometer != null) {
             this.sensorManager.registerListener(this, this.magnetometer, SensorManager.SENSOR_DELAY_NORMAL, sensorHandler);
         }
@@ -96,7 +96,7 @@ public class CapgoCompass implements SensorEventListener {
 
     public void unregisterListeners() {
         this.sensorManager.unregisterListener(this);
-        
+
         // Clean up background thread
         if (sensorThread != null) {
             sensorThread.quitSafely();
@@ -175,13 +175,13 @@ public class CapgoCompass implements SensorEventListener {
 
         if (headingCallback != null) {
             float heading = calculateCurrentHeading();
-            
+
             // Time-based throttle
             long now = System.currentTimeMillis();
             if (now - lastNotifyTime < minIntervalMs) {
                 return; // Skip - too soon
             }
-            
+
             // Heading change threshold (with wraparound handling)
             if (lastNotifiedHeading >= 0) {
                 float diff = Math.abs(heading - lastNotifiedHeading);
@@ -190,10 +190,10 @@ public class CapgoCompass implements SensorEventListener {
                     return; // Skip - heading hasn't changed enough
                 }
             }
-            
+
             lastNotifyTime = now;
             lastNotifiedHeading = heading;
-            
+
             // Post to main thread for WebView communication
             final float finalHeading = heading;
             activity.runOnUiThread(() -> {

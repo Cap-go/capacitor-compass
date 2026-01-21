@@ -9,15 +9,15 @@ import os.log
     private var lastTrueHeading: Double = -1.0
     private var headingCallback: ((Double) -> Void)?
     private var permissionCallback: (() -> Void)?
-    
+
     // Default throttling constants
     private static let defaultMinIntervalSeconds: TimeInterval = 0.1  // Max 10 events/sec
     private static let defaultMinHeadingChange: Double = 2.0  // Minimum 2° change
-    
+
     // Configurable throttling values
     private var minIntervalSeconds: TimeInterval = defaultMinIntervalSeconds
     private var minHeadingChange: Double = defaultMinHeadingChange
-    
+
     // Throttling state
     private var lastNotifyTime: TimeInterval = 0
     private var lastNotifiedHeading: Double = -1.0
@@ -41,7 +41,7 @@ import os.log
             permissionCallback = nil
         }
     }
-    
+
     /// Configure throttling parameters.
     /// - Parameters:
     ///   - minIntervalMs: Minimum interval between events in milliseconds (default: 100)
@@ -57,15 +57,15 @@ import os.log
             return
         }
         self.lastTrueHeading = heading
-        
+
         guard let callback = headingCallback else { return }
         let now = Date().timeIntervalSince1970
-        
+
         // Time-based throttle
         if now - lastNotifyTime < minIntervalSeconds {
             return  // Skip - too soon
         }
-        
+
         // Heading change threshold (with wraparound handling)
         if lastNotifiedHeading >= 0 {
             var diff = abs(heading - lastNotifiedHeading)
@@ -74,7 +74,7 @@ import os.log
                 return  // Skip - heading hasn't changed enough
             }
         }
-        
+
         lastNotifyTime = now
         lastNotifiedHeading = heading
         callback(heading)
@@ -88,7 +88,7 @@ import os.log
         // Reset throttling state
         lastNotifyTime = 0
         lastNotifiedHeading = -1.0
-        
+
         if CLLocationManager.headingAvailable() {
             locationManager.startUpdatingLocation()
             locationManager.startUpdatingHeading()
