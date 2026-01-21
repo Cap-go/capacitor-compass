@@ -133,9 +133,9 @@ startListening(options?: ListeningOptions | undefined) => Promise<void>
 Start listening for compass heading changes via events.
 This starts the compass sensors and emits 'headingChange' events.
 
-| Param         | Type                                                          | Description                                   |
-| ------------- | ------------------------------------------------------------- | --------------------------------------------- |
-| **`options`** | <code><a href="#listeningoptions">ListeningOptions</a></code> | - Optional configuration for event throttling |
+| Param         | Type                                                          | Description                                 |
+| ------------- | ------------------------------------------------------------- | ------------------------------------------- |
+| **`options`** | <code><a href="#listeningoptions">ListeningOptions</a></code> | Optional configuration for event throttling |
 
 **Since:** 7.0.0
 

@@ -28,10 +28,10 @@ public class CapgoCompass implements SensorEventListener {
     private HeadingCallback headingCallback;
 
     // Throttling state
-    private float lastReportedHeading = -1f;
-    private long lastReportedTime = 0;
-    private float minHeadingChange = DEFAULT_MIN_HEADING_CHANGE;
-    private long minIntervalMs = DEFAULT_MIN_INTERVAL_MS;
+    private volatile float lastReportedHeading = -1f;
+    private volatile long lastReportedTime = 0;
+    private volatile float minHeadingChange = DEFAULT_MIN_HEADING_CHANGE;
+    private volatile long minIntervalMs = DEFAULT_MIN_INTERVAL_MS;
 
     // Background thread for sensor processing
     private HandlerThread sensorThread;
@@ -88,6 +88,10 @@ public class CapgoCompass implements SensorEventListener {
 
     public void unregisterListeners() {
         this.sensorManager.unregisterListener(this);
+
+        // Reset throttling state to avoid stale timestamps on resume
+        lastReportedHeading = -1f;
+        lastReportedTime = 0;
 
         // Clean up background thread
         if (sensorThread != null) {
@@ -189,6 +193,12 @@ public class CapgoCompass implements SensorEventListener {
         }
 
         if (headingCallback != null) {
+            // Early time-based throttling check to avoid unnecessary heading calculation
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - lastReportedTime < minIntervalMs) {
+                return;
+            }
+
             float heading = calculateCurrentHeading();
 
             if (shouldReportHeading(heading)) {

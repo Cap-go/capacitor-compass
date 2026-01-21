@@ -67,6 +67,17 @@ public class CapgoCompassPlugin: CAPPlugin, CAPBridgedPlugin {
         // Parse options with defaults
         let minHeadingChange = call.getDouble("minHeadingChange", 2.0)
         let minInterval = call.getDouble("minInterval", 100.0)
+
+        // Validate throttling options
+        if minInterval <= 0 {
+            call.reject("Invalid minInterval: must be greater than 0.")
+            return
+        }
+
+        if minHeadingChange < 0 {
+            call.reject("Invalid minHeadingChange: must be greater than or equal to 0.")
+            return
+        }
         
         // Apply throttling options
         implementation.setThrottlingOptions(minHeadingChange: minHeadingChange, minInterval: minInterval)

@@ -63,6 +63,17 @@ public class CapgoCompassPlugin extends Plugin {
         float minHeadingChange = call.getFloat("minHeadingChange", 2.0f);
         long minInterval = call.getLong("minInterval", 100L);
 
+        // Validate options
+        if (minHeadingChange < 0.0f) {
+            call.reject("Invalid minHeadingChange: value must be greater than or equal to 0.0");
+            return;
+        }
+
+        if (minInterval < 0L) {
+            call.reject("Invalid minInterval: value must be greater than or equal to 0");
+            return;
+        }
+
         // Apply throttling options
         implementation.setThrottlingOptions(minHeadingChange, minInterval);
 
