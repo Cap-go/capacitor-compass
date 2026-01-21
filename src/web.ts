@@ -19,10 +19,12 @@ export class CapgoCompassWeb extends WebPlugin implements CapgoCompassPlugin {
     throw this.unavailable('Compass not available on web');
   }
 
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   async addListener(
     _eventName: 'headingChange',
     _listenerFunc: (event: HeadingChangeEvent) => void,
   ): Promise<{ remove: () => Promise<void> }> {
+    /* eslint-enable @typescript-eslint/no-unused-vars */
     throw this.unavailable('Compass not available on web');
   }
 

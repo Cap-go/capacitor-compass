@@ -9,7 +9,7 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 @CapacitorPlugin(name = "CapgoCompass")
 public class CapgoCompassPlugin extends Plugin {
 
-    private final String pluginVersion = "8.1.3";
+    private final String pluginVersion = "8.1.4";
     private CapgoCompass implementation;
     private boolean isListening = false;
 
@@ -58,6 +58,14 @@ public class CapgoCompassPlugin extends Plugin {
             call.resolve();
             return;
         }
+
+        // Parse optional throttling configuration
+        Integer minInterval = call.getInt("minInterval");
+        Double minHeadingChange = call.getDouble("minHeadingChange");
+
+        long intervalMs = minInterval != null ? minInterval.longValue() : 100L;
+        float headingChange = minHeadingChange != null ? minHeadingChange.floatValue() : 2.0f;
+        implementation.setThrottling(intervalMs, headingChange);
 
         isListening = true;
         implementation.setHeadingCallback((heading) -> {
