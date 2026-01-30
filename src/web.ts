@@ -1,6 +1,14 @@
 import { WebPlugin } from '@capacitor/core';
 
-import type { CapgoCompassPlugin, CompassHeading, HeadingChangeEvent, PermissionStatus } from './definitions';
+import type {
+  CapgoCompassPlugin,
+  CompassHeading,
+  HeadingChangeEvent,
+  PermissionStatus,
+  AccuracyChangeEvent,
+  WatchAccuracyOptions,
+} from './definitions';
+import { CompassAccuracy } from './definitions';
 
 export class CapgoCompassWeb extends WebPlugin implements CapgoCompassPlugin {
   async getCurrentHeading(): Promise<CompassHeading> {
@@ -21,8 +29,8 @@ export class CapgoCompassWeb extends WebPlugin implements CapgoCompassPlugin {
 
   /* eslint-disable @typescript-eslint/no-unused-vars */
   async addListener(
-    _eventName: 'headingChange',
-    _listenerFunc: (event: HeadingChangeEvent) => void,
+    _eventName: 'headingChange' | 'accuracyChange',
+    _listenerFunc: ((event: HeadingChangeEvent) => void) | ((event: AccuracyChangeEvent) => void),
   ): Promise<{ remove: () => Promise<void> }> {
     /* eslint-enable @typescript-eslint/no-unused-vars */
     throw this.unavailable('Compass not available on web');
@@ -34,5 +42,19 @@ export class CapgoCompassWeb extends WebPlugin implements CapgoCompassPlugin {
 
   async requestPermissions(): Promise<PermissionStatus> {
     throw this.unavailable('Compass not available on web');
+  }
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  async watchAccuracy(_options?: WatchAccuracyOptions): Promise<void> {
+    /* eslint-enable @typescript-eslint/no-unused-vars */
+    // No-op on web - accuracy monitoring not available
+  }
+
+  async unwatchAccuracy(): Promise<void> {
+    // No-op on web - accuracy monitoring not available
+  }
+
+  async getAccuracy(): Promise<{ accuracy: CompassAccuracy }> {
+    return { accuracy: CompassAccuracy.UNKNOWN };
   }
 }

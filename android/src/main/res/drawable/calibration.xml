@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    
+    <!-- Phone outline -->
+    <path
+        android:fillColor="#E0E0E0"
+        android:pathData="M60,40 L140,40 Q145,40 145,45 L145,155 Q145,160 140,160 L60,160 Q55,160 55,155 L55,45 Q55,40 60,40 Z" />
+    
+    <!-- Screen -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M65,50 L135,50 L135,150 L65,150 Z" />
+    
+    <!-- Figure-8 pattern showing calibration movement -->
+    <path
+        android:strokeWidth="3"
+        android:strokeColor="#2196F3"
+        android:fillColor="#00000000"
+        android:pathData="M70,80 Q85,65 100,80 Q115,95 100,110 Q85,125 70,110 Q55,95 70,80 Z M100,110 Q115,95 130,110 Q145,125 130,140 Q115,155 100,140 Q85,125 100,110 Z" />
+    
+    <!-- Arrows showing direction -->
+    <path
+        android:fillColor="#2196F3"
+        android:pathData="M68,75 L63,78 L68,81 Z" />
+    <path
+        android:fillColor="#2196F3"
+        android:pathData="M132,105 L137,108 L132,111 Z" />
+</vector>

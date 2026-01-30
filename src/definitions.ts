@@ -45,6 +45,50 @@ export interface ListeningOptions {
 }
 
 /**
+ * Compass accuracy level constants.
+ *
+ * @since 8.2.0
+ */
+export enum CompassAccuracy {
+  /** High accuracy - approximates to less than 5 degrees of error */
+  HIGH = 3,
+  /** Medium accuracy - approximates to less than 10 degrees of error */
+  MEDIUM = 2,
+  /** Low accuracy - approximates to less than 15 degrees of error */
+  LOW = 1,
+  /** Unreliable accuracy - approximates to more than 15 degrees of error */
+  UNRELIABLE = 0,
+  /** Unknown accuracy value */
+  UNKNOWN = -1,
+}
+
+/**
+ * Event data for accuracy change events.
+ *
+ * @since 8.2.0
+ */
+export interface AccuracyChangeEvent {
+  /** Current accuracy level of the compass */
+  accuracy: CompassAccuracy;
+}
+
+/**
+ * Options for configuring accuracy monitoring behavior.
+ *
+ * @since 8.2.0
+ */
+export interface WatchAccuracyOptions {
+  /**
+   * Required accuracy level.
+   * If the compass accuracy drops below this level, a calibration dialog will be shown.
+   *
+   * @default CompassAccuracy.HIGH
+   * @since 8.2.0
+   */
+  requiredAccuracy?: CompassAccuracy;
+}
+
+/**
  * Permission state for compass access.
  *
  * @since 7.0.0
@@ -143,7 +187,7 @@ export interface CapgoCompassPlugin {
   stopListening(): Promise<void>;
 
   /**
-   * Add a listener for compass events.
+   * Add a listener for compass heading change events.
    *
    * @param eventName - The event to listen for ('headingChange')
    * @param listenerFunc - The function to call when the event is emitted
@@ -160,6 +204,27 @@ export interface CapgoCompassPlugin {
   addListener(
     eventName: 'headingChange',
     listenerFunc: (event: HeadingChangeEvent) => void,
+  ): Promise<{ remove: () => Promise<void> }>;
+
+  /**
+   * Add a listener for compass accuracy change events.
+   * Only supported on Android. On iOS and Web, this will never emit events.
+   *
+   * @param eventName - The event to listen for ('accuracyChange')
+   * @param listenerFunc - The function to call when the event is emitted
+   * @returns A promise that resolves with a handle to remove the listener
+   * @since 8.2.0
+   * @example
+   * ```typescript
+   * const handle = await CapgoCompass.addListener('accuracyChange', (event) => {
+   *   console.log('Compass accuracy:', event.accuracy);
+   * });
+   * // Later: handle.remove();
+   * ```
+   */
+  addListener(
+    eventName: 'accuracyChange',
+    listenerFunc: (event: AccuracyChangeEvent) => void,
   ): Promise<{ remove: () => Promise<void> }>;
 
   /**
@@ -205,4 +270,60 @@ export interface CapgoCompassPlugin {
    * ```
    */
   requestPermissions(): Promise<PermissionStatus>;
+
+  /**
+   * Start monitoring compass accuracy.
+   * On Android, this monitors the magnetometer accuracy and shows a calibration dialog
+   * if the accuracy drops below the required level.
+   * On iOS and Web, this method does nothing as compass accuracy monitoring is not needed.
+   *
+   * @param options - Optional configuration for accuracy monitoring
+   * @returns Promise that resolves when monitoring starts
+   * @since 8.2.0
+   * @example
+   * ```typescript
+   * // Monitor with default high accuracy requirement
+   * await CapgoCompass.watchAccuracy();
+   *
+   * // Monitor with custom accuracy requirement
+   * await CapgoCompass.watchAccuracy({
+   *   requiredAccuracy: CompassAccuracy.MEDIUM
+   * });
+   *
+   * CapgoCompass.addListener('accuracyChange', (event) => {
+   *   console.log('Accuracy changed to:', event.accuracy);
+   * });
+   * ```
+   */
+  watchAccuracy(options?: WatchAccuracyOptions): Promise<void>;
+
+  /**
+   * Stop monitoring compass accuracy.
+   * This stops the accuracy monitoring and dismisses any calibration dialog.
+   *
+   * @returns Promise that resolves when monitoring stops
+   * @since 8.2.0
+   * @example
+   * ```typescript
+   * await CapgoCompass.unwatchAccuracy();
+   * ```
+   */
+  unwatchAccuracy(): Promise<void>;
+
+  /**
+   * Get the current compass accuracy level.
+   * On Android, returns the current magnetometer sensor accuracy.
+   * On iOS and Web, always returns CompassAccuracy.UNKNOWN as accuracy monitoring is not available.
+   *
+   * @returns Promise that resolves with the current accuracy level
+   * @since 8.2.0
+   * @example
+   * ```typescript
+   * const { accuracy } = await CapgoCompass.getAccuracy();
+   * if (accuracy < CompassAccuracy.MEDIUM) {
+   *   console.log('Compass needs calibration');
+   * }
+   * ```
+   */
+  getAccuracy(): Promise<{ accuracy: CompassAccuracy }>;
 }

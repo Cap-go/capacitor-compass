@@ -78,11 +78,16 @@ await handle.remove();
 * [`startListening(...)`](#startlistening)
 * [`stopListening()`](#stoplistening)
 * [`addListener('headingChange', ...)`](#addlistenerheadingchange-)
+* [`addListener('accuracyChange', ...)`](#addlisteneraccuracychange-)
 * [`removeAllListeners()`](#removealllisteners)
 * [`checkPermissions()`](#checkpermissions)
 * [`requestPermissions()`](#requestpermissions)
+* [`watchAccuracy(...)`](#watchaccuracy)
+* [`unwatchAccuracy()`](#unwatchaccuracy)
+* [`getAccuracy()`](#getaccuracy)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
+* [Enums](#enums)
 
 </docgen-index>
 
@@ -162,7 +167,7 @@ This stops the compass sensors and stops emitting events.
 addListener(eventName: 'headingChange', listenerFunc: (event: HeadingChangeEvent) => void) => Promise<{ remove: () => Promise<void>; }>
 ```
 
-Add a listener for compass events.
+Add a listener for compass heading change events.
 
 | Param              | Type                                                                                  | Description                                      |
 | ------------------ | ------------------------------------------------------------------------------------- | ------------------------------------------------ |
@@ -172,6 +177,27 @@ Add a listener for compass events.
 **Returns:** <code>Promise&lt;{ remove: () =&gt; Promise&lt;void&gt;; }&gt;</code>
 
 **Since:** 7.0.0
+
+--------------------
+
+
+### addListener('accuracyChange', ...)
+
+```typescript
+addListener(eventName: 'accuracyChange', listenerFunc: (event: AccuracyChangeEvent) => void) => Promise<{ remove: () => Promise<void>; }>
+```
+
+Add a listener for compass accuracy change events.
+Only supported on Android. On iOS and Web, this will never emit events.
+
+| Param              | Type                                                                                    | Description                                      |
+| ------------------ | --------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| **`eventName`**    | <code>'accuracyChange'</code>                                                           | - The event to listen for ('accuracyChange')     |
+| **`listenerFunc`** | <code>(event: <a href="#accuracychangeevent">AccuracyChangeEvent</a>) =&gt; void</code> | - The function to call when the event is emitted |
+
+**Returns:** <code>Promise&lt;{ remove: () =&gt; Promise&lt;void&gt;; }&gt;</code>
+
+**Since:** 8.2.0
 
 --------------------
 
@@ -223,6 +249,57 @@ On Android, this resolves immediately as no permissions are required.
 --------------------
 
 
+### watchAccuracy(...)
+
+```typescript
+watchAccuracy(options?: WatchAccuracyOptions | undefined) => Promise<void>
+```
+
+Start monitoring compass accuracy.
+On Android, this monitors the magnetometer accuracy and shows a calibration dialog
+if the accuracy drops below the required level.
+On iOS and Web, this method does nothing as compass accuracy monitoring is not needed.
+
+| Param         | Type                                                                  | Description                                      |
+| ------------- | --------------------------------------------------------------------- | ------------------------------------------------ |
+| **`options`** | <code><a href="#watchaccuracyoptions">WatchAccuracyOptions</a></code> | - Optional configuration for accuracy monitoring |
+
+**Since:** 8.2.0
+
+--------------------
+
+
+### unwatchAccuracy()
+
+```typescript
+unwatchAccuracy() => Promise<void>
+```
+
+Stop monitoring compass accuracy.
+This stops the accuracy monitoring and dismisses any calibration dialog.
+
+**Since:** 8.2.0
+
+--------------------
+
+
+### getAccuracy()
+
+```typescript
+getAccuracy() => Promise<{ accuracy: CompassAccuracy; }>
+```
+
+Get the current compass accuracy level.
+On Android, returns the current magnetometer sensor accuracy.
+On iOS and Web, always returns <a href="#compassaccuracy">CompassAccuracy.UNKNOWN</a> as accuracy monitoring is not available.
+
+**Returns:** <code>Promise&lt;{ accuracy: <a href="#compassaccuracy">CompassAccuracy</a>; }&gt;</code>
+
+**Since:** 8.2.0
+
+--------------------
+
+
 ### Interfaces
 
 
@@ -254,6 +331,15 @@ Event data for heading change events.
 | **`value`** | <code>number</code> | Compass heading in degrees (0-360) |
 
 
+#### AccuracyChangeEvent
+
+Event data for accuracy change events.
+
+| Prop           | Type                                                        | Description                           |
+| -------------- | ----------------------------------------------------------- | ------------------------------------- |
+| **`accuracy`** | <code><a href="#compassaccuracy">CompassAccuracy</a></code> | Current accuracy level of the compass |
+
+
 #### PermissionStatus
 
 Permission status for compass plugin.
@@ -263,12 +349,35 @@ Permission status for compass plugin.
 | **`compass`** | <code><a href="#permissionstate">PermissionState</a></code> | Permission state for accessing compass/location data. On iOS, this requires location permission to access heading. On Android, no special permissions are required for compass sensors. | 7.0.0 |
 
 
+#### WatchAccuracyOptions
+
+Options for configuring accuracy monitoring behavior.
+
+| Prop                   | Type                                                        | Description                                                                                                  | Default                           | Since |
+| ---------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------- | ----- |
+| **`requiredAccuracy`** | <code><a href="#compassaccuracy">CompassAccuracy</a></code> | Required accuracy level. If the compass accuracy drops below this level, a calibration dialog will be shown. | <code>CompassAccuracy.HIGH</code> | 8.2.0 |
+
+
 ### Type Aliases
 
 
 #### PermissionState
 
 <code>'prompt' | 'prompt-with-rationale' | 'granted' | 'denied'</code>
+
+
+### Enums
+
+
+#### CompassAccuracy
+
+| Members          | Value           | Description                                                         |
+| ---------------- | --------------- | ------------------------------------------------------------------- |
+| **`HIGH`**       | <code>3</code>  | High accuracy - approximates to less than 5 degrees of error        |
+| **`MEDIUM`**     | <code>2</code>  | Medium accuracy - approximates to less than 10 degrees of error     |
+| **`LOW`**        | <code>1</code>  | Low accuracy - approximates to less than 15 degrees of error        |
+| **`UNRELIABLE`** | <code>0</code>  | Unreliable accuracy - approximates to more than 15 degrees of error |
+| **`UNKNOWN`**    | <code>-1</code> | Unknown accuracy value                                              |
 
 </docgen-api>
 
