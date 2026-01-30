@@ -32,6 +32,10 @@ public class CapgoCompass implements SensorEventListener {
     private float[] magneticValues = new float[3];
     private HeadingCallback headingCallback;
 
+    // Accuracy monitoring
+    private AccuracyCallback accuracyCallback;
+    private volatile int currentAccuracy = -1; // -1 = UNKNOWN
+
     // Background thread for sensor processing
     private HandlerThread sensorThread;
     private Handler sensorHandler;
@@ -42,6 +46,10 @@ public class CapgoCompass implements SensorEventListener {
 
     public interface HeadingCallback {
         void onHeadingChanged(float heading);
+    }
+
+    public interface AccuracyCallback {
+        void onAccuracyChanged(int accuracy);
     }
 
     public CapgoCompass(AppCompatActivity activity) {
@@ -64,6 +72,14 @@ public class CapgoCompass implements SensorEventListener {
 
     public void setHeadingCallback(HeadingCallback callback) {
         this.headingCallback = callback;
+    }
+
+    public void setAccuracyCallback(AccuracyCallback callback) {
+        this.accuracyCallback = callback;
+    }
+
+    public int getCurrentAccuracy() {
+        return this.currentAccuracy;
     }
 
     /**
@@ -205,5 +221,19 @@ public class CapgoCompass implements SensorEventListener {
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        if (sensor == magnetometer) {
+            Log.d(TAG, "Magnetometer accuracy changed to: " + accuracy);
+            currentAccuracy = accuracy;
+
+            if (accuracyCallback != null) {
+                // Post to main thread for WebView communication
+                activity.runOnUiThread(() -> {
+                    if (accuracyCallback != null) {
+                        accuracyCallback.onAccuracyChanged(accuracy);
+                    }
+                });
+            }
+        }
+    }
 }

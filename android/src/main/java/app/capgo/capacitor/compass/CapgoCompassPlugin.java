@@ -12,6 +12,7 @@ public class CapgoCompassPlugin extends Plugin {
     private final String pluginVersion = "8.1.5";
     private CapgoCompass implementation;
     private boolean isListening = false;
+    private boolean isWatchingAccuracy = false;
 
     @Override
     public void load() {
@@ -105,6 +106,51 @@ public class CapgoCompassPlugin extends Plugin {
         // Android does not require any permissions for compass/sensor access
         JSObject ret = new JSObject();
         ret.put("compass", "granted");
+        call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void watchAccuracy(PluginCall call) {
+        if (isWatchingAccuracy) {
+            call.resolve();
+            return;
+        }
+
+        isWatchingAccuracy = true;
+        implementation.setAccuracyCallback((currentAccuracy) -> {
+            JSObject ret = new JSObject();
+            ret.put("accuracy", currentAccuracy);
+            notifyListeners("accuracyChange", ret);
+        });
+
+        // If we already have accuracy data, emit it immediately
+        int currentAccuracy = implementation.getCurrentAccuracy();
+        if (currentAccuracy >= 0) {
+            JSObject ret = new JSObject();
+            ret.put("accuracy", currentAccuracy);
+            notifyListeners("accuracyChange", ret);
+        }
+
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void unwatchAccuracy(PluginCall call) {
+        if (!isWatchingAccuracy) {
+            call.resolve();
+            return;
+        }
+
+        isWatchingAccuracy = false;
+        implementation.setAccuracyCallback(null);
+
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void getAccuracy(PluginCall call) {
+        JSObject ret = new JSObject();
+        ret.put("accuracy", implementation.getCurrentAccuracy());
         call.resolve(ret);
     }
 }

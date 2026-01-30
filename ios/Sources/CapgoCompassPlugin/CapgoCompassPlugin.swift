@@ -17,7 +17,10 @@ public class CapgoCompassPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "startListening", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "stopListening", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "checkPermissions", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "requestPermissions", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "requestPermissions", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "watchAccuracy", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "unwatchAccuracy", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getAccuracy", returnType: CAPPluginReturnPromise)
     ]
     private let implementation = CapgoCompass()
     private var isListening = false
@@ -134,5 +137,22 @@ public class CapgoCompassPlugin: CAPPlugin, CAPBridgedPlugin {
         @unknown default:
             return "prompt"
         }
+    }
+
+    @objc func watchAccuracy(_ call: CAPPluginCall) {
+        // No-op on iOS - compass accuracy monitoring not available
+        // iOS automatically calibrates compass since iPhone 5S
+        call.resolve()
+    }
+
+    @objc func unwatchAccuracy(_ call: CAPPluginCall) {
+        // No-op on iOS - compass accuracy monitoring not available
+        call.resolve()
+    }
+
+    @objc func getAccuracy(_ call: CAPPluginCall) {
+        // Return UNKNOWN on iOS - accuracy monitoring not available
+        // iOS automatically calibrates compass, so this information is not exposed
+        call.resolve(["accuracy": -1]) // -1 = CompassAccuracy.UNKNOWN
     }
 }
