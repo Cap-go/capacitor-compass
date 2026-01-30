@@ -29,6 +29,14 @@ export class CapgoCompassWeb extends WebPlugin implements CapgoCompassPlugin {
 
   /* eslint-disable @typescript-eslint/no-unused-vars */
   async addListener(
+    _eventName: 'headingChange',
+    _listenerFunc: (event: HeadingChangeEvent) => void,
+  ): Promise<{ remove: () => Promise<void> }>;
+  async addListener(
+    _eventName: 'accuracyChange',
+    _listenerFunc: (event: AccuracyChangeEvent) => void,
+  ): Promise<{ remove: () => Promise<void> }>;
+  async addListener(
     _eventName: 'headingChange' | 'accuracyChange',
     _listenerFunc: ((event: HeadingChangeEvent) => void) | ((event: AccuracyChangeEvent) => void),
   ): Promise<{ remove: () => Promise<void> }> {
