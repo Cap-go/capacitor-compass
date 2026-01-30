@@ -16,11 +16,13 @@ The official Capacitor [Motion API](https://capacitorjs.com/docs/apis/motion) re
 - **Additional permissions handling** through web APIs
 - **Limited accuracy** compared to native implementations
 - **Poor performance** on some devices
+- **No accuracy monitoring** to ensure reliable compass readings
 
 This plugin provides **true native compass functionality** using:
 
 - **iOS**: `CLLocationManager` for accurate heading data via CoreLocation
 - **Android**: Hardware sensors (accelerometer + magnetometer) for precise bearing calculation
+- **Accuracy monitoring**: Monitor compass accuracy on Android and prompt users to calibrate when needed
 - **Event-based API**: Modern `addListener` pattern for real-time heading updates
 
 Essential for navigation apps, augmented reality, location-based games, and any app needing accurate compass heading.
@@ -50,7 +52,7 @@ No additional setup required. The plugin uses the device's accelerometer and mag
 ## Usage
 
 ```typescript
-import { CapgoCompass } from '@capgo/capacitor-compass';
+import { CapgoCompass, CompassAccuracy } from '@capgo/capacitor-compass';
 
 // Get current heading once
 const { value } = await CapgoCompass.getCurrentHeading();
@@ -64,9 +66,28 @@ const handle = await CapgoCompass.addListener('headingChange', (event) => {
 // Start the compass sensor
 await CapgoCompass.startListening();
 
+// Monitor compass accuracy (Android only)
+const accuracyHandle = await CapgoCompass.addListener('accuracyChange', (event) => {
+  console.log('Compass accuracy:', event.accuracy);
+  if (event.accuracy < CompassAccuracy.MEDIUM) {
+    console.log('Compass needs calibration');
+  }
+});
+
+// Start accuracy monitoring - shows calibration dialog if accuracy is low
+await CapgoCompass.watchAccuracy({
+  requiredAccuracy: CompassAccuracy.HIGH
+});
+
+// Get current accuracy
+const { accuracy } = await CapgoCompass.getAccuracy();
+console.log('Current accuracy:', accuracy);
+
 // Later: stop listening
 await CapgoCompass.stopListening();
+await CapgoCompass.unwatchAccuracy();
 await handle.remove();
+await accuracyHandle.remove();
 ```
 
 ## API

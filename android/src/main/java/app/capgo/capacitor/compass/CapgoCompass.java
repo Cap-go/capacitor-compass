@@ -243,4 +243,3 @@ public class CapgoCompass implements SensorEventListener {
         }
     }
 }
-}

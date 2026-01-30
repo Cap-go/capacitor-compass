@@ -84,8 +84,9 @@ public class AccuracyMonitor {
             RelativeLayout dialogRelativeLayout = new RelativeLayout(context);
             dialogRelativeLayout.setId(RELATIVE_LAYOUT_ID);
             RelativeLayout.LayoutParams dialogRelativeLayoutParams = new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.MATCH_PARENT,
-                    RelativeLayout.LayoutParams.MATCH_PARENT);
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.MATCH_PARENT
+            );
             dialogRelativeLayout.setLayoutParams(dialogRelativeLayoutParams);
             dialogRelativeLayout.setBackgroundColor(0xFFFFFFFF);
 
@@ -93,8 +94,9 @@ public class AccuracyMonitor {
             TextView titleTextView = new TextView(context);
             titleTextView.setId(RELATIVE_LAYOUT_ID + 1);
             RelativeLayout.LayoutParams titleTextParams = new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT);
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+            );
             titleTextParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
             titleTextParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
             titleTextParams.setMargins(DEFAULT_HORIZONTAL_MARGIN, DEFAULT_HORIZONTAL_MARGIN, DEFAULT_HORIZONTAL_MARGIN, 0);
@@ -110,8 +112,9 @@ public class AccuracyMonitor {
             TextView hintTextView = new TextView(context);
             hintTextView.setId(RELATIVE_LAYOUT_ID + 2);
             RelativeLayout.LayoutParams hintTextParams = new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT);
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+            );
             hintTextParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
             hintTextParams.addRule(RelativeLayout.BELOW, titleTextView.getId());
             hintTextParams.setMargins(DEFAULT_HORIZONTAL_MARGIN, DEFAULT_VERTICAL_MARGIN, DEFAULT_HORIZONTAL_MARGIN, 0);
@@ -126,8 +129,9 @@ public class AccuracyMonitor {
             ImageView imageView = new ImageView(context);
             imageView.setId(RELATIVE_LAYOUT_ID + 3);
             RelativeLayout.LayoutParams imageParams = new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT);
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+            );
             imageParams.addRule(RelativeLayout.CENTER_IN_PARENT);
             imageParams.setMargins(DEFAULT_HORIZONTAL_MARGIN, DEFAULT_VERTICAL_MARGIN, DEFAULT_HORIZONTAL_MARGIN, DEFAULT_VERTICAL_MARGIN);
             imageView.setLayoutParams(imageParams);
@@ -143,12 +147,18 @@ public class AccuracyMonitor {
             Button button = new Button(context);
             button.setId(RELATIVE_LAYOUT_ID + 4);
             RelativeLayout.LayoutParams buttonParams = new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT);
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+            );
             buttonParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
             buttonParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
             int buttonBottomOffset = 16;
-            buttonParams.setMargins(DEFAULT_HORIZONTAL_MARGIN, DEFAULT_VERTICAL_MARGIN + buttonBottomOffset, DEFAULT_HORIZONTAL_MARGIN, DEFAULT_VERTICAL_MARGIN);
+            buttonParams.setMargins(
+                DEFAULT_HORIZONTAL_MARGIN,
+                DEFAULT_VERTICAL_MARGIN + buttonBottomOffset,
+                DEFAULT_HORIZONTAL_MARGIN,
+                DEFAULT_VERTICAL_MARGIN
+            );
 
             button.setLayoutParams(buttonParams);
             button.setText("DONE");
@@ -161,8 +171,9 @@ public class AccuracyMonitor {
             accuracyTextView = new TextView(context);
             accuracyTextView.setId(RELATIVE_LAYOUT_ID + 5);
             RelativeLayout.LayoutParams accuracyTextParams = new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT);
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+            );
             accuracyTextParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
             accuracyTextParams.addRule(RelativeLayout.ABOVE, button.getId());
             accuracyTextParams.setMargins(DEFAULT_HORIZONTAL_MARGIN, DEFAULT_VERTICAL_MARGIN, DEFAULT_HORIZONTAL_MARGIN, 0);
@@ -182,12 +193,14 @@ public class AccuracyMonitor {
             dialog.show();
 
             // Set a click listener for the button to dismiss the dialog
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    hideDialog();
+            button.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        hideDialog();
+                    }
                 }
-            });
+            );
 
             // Make the dialog modal by setting its cancelable properties to false
             dialog.setCancelable(false);
@@ -206,12 +219,22 @@ public class AccuracyMonitor {
                     accuracyTextView.setText("");
 
                     SpannableString compassAccuracyPrefix = new SpannableString("Compass accuracy: ");
-                    compassAccuracyPrefix.setSpan(new ForegroundColorSpan(Color.BLACK), 0, compassAccuracyPrefix.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    compassAccuracyPrefix.setSpan(
+                        new ForegroundColorSpan(Color.BLACK),
+                        0,
+                        compassAccuracyPrefix.length(),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    );
                     accuracyTextView.setText(compassAccuracyPrefix, TextView.BufferType.SPANNABLE);
 
                     SpannableString accuracyValue = new SpannableString(accuracyName);
                     accuracyValue.setSpan(new StyleSpan(Typeface.BOLD), 0, accuracyValue.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    accuracyValue.setSpan(new ForegroundColorSpan(accuracyColor), 0, accuracyValue.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    accuracyValue.setSpan(
+                        new ForegroundColorSpan(accuracyColor),
+                        0,
+                        accuracyValue.length(),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    );
                     accuracyTextView.append(accuracyValue);
                 }
             });
