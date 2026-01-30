@@ -11,14 +11,12 @@ public class CapgoCompassPlugin extends Plugin {
 
     private final String pluginVersion = "8.1.5";
     private CapgoCompass implementation;
-    private AccuracyMonitor accuracyMonitor;
     private boolean isListening = false;
     private boolean isWatchingAccuracy = false;
 
     @Override
     public void load() {
         this.implementation = new CapgoCompass(getActivity());
-        this.accuracyMonitor = new AccuracyMonitor(getActivity());
     }
 
     @Override
@@ -118,31 +116,19 @@ public class CapgoCompassPlugin extends Plugin {
             return;
         }
 
-        // Parse optional required accuracy configuration
-        Integer requiredAccuracy = call.getInt("requiredAccuracy");
-        int accuracy = requiredAccuracy != null ? requiredAccuracy : 3; // Default to HIGH (3)
-
-        implementation.setRequiredAccuracy(accuracy);
-        accuracyMonitor.setRequiredAccuracy(accuracy);
-        accuracyMonitor.resetDialogState();
-
         isWatchingAccuracy = true;
         implementation.setAccuracyCallback((currentAccuracy) -> {
             JSObject ret = new JSObject();
             ret.put("accuracy", currentAccuracy);
             notifyListeners("accuracyChange", ret);
-
-            // Evaluate whether to show calibration dialog
-            accuracyMonitor.evaluateAccuracy(currentAccuracy);
         });
 
-        // If we already have accuracy data, evaluate it immediately
+        // If we already have accuracy data, emit it immediately
         int currentAccuracy = implementation.getCurrentAccuracy();
         if (currentAccuracy >= 0) {
             JSObject ret = new JSObject();
             ret.put("accuracy", currentAccuracy);
             notifyListeners("accuracyChange", ret);
-            accuracyMonitor.evaluateAccuracy(currentAccuracy);
         }
 
         call.resolve();
@@ -157,8 +143,6 @@ public class CapgoCompassPlugin extends Plugin {
 
         isWatchingAccuracy = false;
         implementation.setAccuracyCallback(null);
-        accuracyMonitor.hideDialog();
-        accuracyMonitor.resetDialogState();
 
         call.resolve();
     }

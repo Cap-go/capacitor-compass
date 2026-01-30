@@ -6,7 +6,6 @@ import type {
   HeadingChangeEvent,
   PermissionStatus,
   AccuracyChangeEvent,
-  WatchAccuracyOptions,
 } from './definitions';
 import { CompassAccuracy } from './definitions';
 
@@ -53,7 +52,7 @@ export class CapgoCompassWeb extends WebPlugin implements CapgoCompassPlugin {
   }
 
   /* eslint-disable @typescript-eslint/no-unused-vars */
-  async watchAccuracy(_options?: WatchAccuracyOptions): Promise<void> {
+  async watchAccuracy(): Promise<void> {
     /* eslint-enable @typescript-eslint/no-unused-vars */
     // No-op on web - accuracy monitoring not available
   }

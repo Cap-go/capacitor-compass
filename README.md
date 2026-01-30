@@ -71,13 +71,12 @@ const accuracyHandle = await CapgoCompass.addListener('accuracyChange', (event) 
   console.log('Compass accuracy:', event.accuracy);
   if (event.accuracy < CompassAccuracy.MEDIUM) {
     console.log('Compass needs calibration');
+    // Show your own custom UI to prompt user to calibrate
   }
 });
 
-// Start accuracy monitoring - shows calibration dialog if accuracy is low
-await CapgoCompass.watchAccuracy({
-  requiredAccuracy: CompassAccuracy.HIGH
-});
+// Start accuracy monitoring
+await CapgoCompass.watchAccuracy();
 
 // Get current accuracy
 const { accuracy } = await CapgoCompass.getAccuracy();
@@ -103,7 +102,7 @@ await accuracyHandle.remove();
 * [`removeAllListeners()`](#removealllisteners)
 * [`checkPermissions()`](#checkpermissions)
 * [`requestPermissions()`](#requestpermissions)
-* [`watchAccuracy(...)`](#watchaccuracy)
+* [`watchAccuracy()`](#watchaccuracy)
 * [`unwatchAccuracy()`](#unwatchaccuracy)
 * [`getAccuracy()`](#getaccuracy)
 * [Interfaces](#interfaces)
@@ -270,20 +269,16 @@ On Android, this resolves immediately as no permissions are required.
 --------------------
 
 
-### watchAccuracy(...)
+### watchAccuracy()
 
 ```typescript
-watchAccuracy(options?: WatchAccuracyOptions | undefined) => Promise<void>
+watchAccuracy() => Promise<void>
 ```
 
 Start monitoring compass accuracy.
-On Android, this monitors the magnetometer accuracy and shows a calibration dialog
-if the accuracy drops below the required level.
-On iOS and Web, this method does nothing as compass accuracy monitoring is not needed.
-
-| Param         | Type                                                                  | Description                                      |
-| ------------- | --------------------------------------------------------------------- | ------------------------------------------------ |
-| **`options`** | <code><a href="#watchaccuracyoptions">WatchAccuracyOptions</a></code> | - Optional configuration for accuracy monitoring |
+On Android, this monitors the magnetometer accuracy and emits accuracyChange events.
+Developers can listen to these events and implement their own UI for calibration prompts.
+On iOS and Web, this method does nothing as compass accuracy monitoring is not available.
 
 **Since:** 8.2.0
 
@@ -297,7 +292,7 @@ unwatchAccuracy() => Promise<void>
 ```
 
 Stop monitoring compass accuracy.
-This stops the accuracy monitoring and dismisses any calibration dialog.
+This stops the accuracy monitoring.
 
 **Since:** 8.2.0
 
@@ -368,15 +363,6 @@ Permission status for compass plugin.
 | Prop          | Type                                                        | Description                                                                                                                                                                             | Since |
 | ------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
 | **`compass`** | <code><a href="#permissionstate">PermissionState</a></code> | Permission state for accessing compass/location data. On iOS, this requires location permission to access heading. On Android, no special permissions are required for compass sensors. | 7.0.0 |
-
-
-#### WatchAccuracyOptions
-
-Options for configuring accuracy monitoring behavior.
-
-| Prop                   | Type                                                        | Description                                                                                                  | Default                           | Since |
-| ---------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------- | ----- |
-| **`requiredAccuracy`** | <code><a href="#compassaccuracy">CompassAccuracy</a></code> | Required accuracy level. If the compass accuracy drops below this level, a calibration dialog will be shown. | <code>CompassAccuracy.HIGH</code> | 8.2.0 |
 
 
 ### Type Aliases

@@ -73,22 +73,6 @@ export interface AccuracyChangeEvent {
 }
 
 /**
- * Options for configuring accuracy monitoring behavior.
- *
- * @since 8.2.0
- */
-export interface WatchAccuracyOptions {
-  /**
-   * Required accuracy level.
-   * If the compass accuracy drops below this level, a calibration dialog will be shown.
-   *
-   * @default CompassAccuracy.HIGH
-   * @since 8.2.0
-   */
-  requiredAccuracy?: CompassAccuracy;
-}
-
-/**
  * Permission state for compass access.
  *
  * @since 7.0.0
@@ -273,33 +257,31 @@ export interface CapgoCompassPlugin {
 
   /**
    * Start monitoring compass accuracy.
-   * On Android, this monitors the magnetometer accuracy and shows a calibration dialog
-   * if the accuracy drops below the required level.
-   * On iOS and Web, this method does nothing as compass accuracy monitoring is not needed.
+   * On Android, this monitors the magnetometer accuracy and emits accuracyChange events.
+   * Developers can listen to these events and implement their own UI for calibration prompts.
+   * On iOS and Web, this method does nothing as compass accuracy monitoring is not available.
    *
-   * @param options - Optional configuration for accuracy monitoring
    * @returns Promise that resolves when monitoring starts
    * @since 8.2.0
    * @example
    * ```typescript
-   * // Monitor with default high accuracy requirement
+   * // Start monitoring accuracy
    * await CapgoCompass.watchAccuracy();
    *
-   * // Monitor with custom accuracy requirement
-   * await CapgoCompass.watchAccuracy({
-   *   requiredAccuracy: CompassAccuracy.MEDIUM
-   * });
-   *
+   * // Listen for accuracy changes and implement custom UI
    * CapgoCompass.addListener('accuracyChange', (event) => {
    *   console.log('Accuracy changed to:', event.accuracy);
+   *   if (event.accuracy < CompassAccuracy.MEDIUM) {
+   *     // Show your custom calibration UI
+   *   }
    * });
    * ```
    */
-  watchAccuracy(options?: WatchAccuracyOptions): Promise<void>;
+  watchAccuracy(): Promise<void>;
 
   /**
    * Stop monitoring compass accuracy.
-   * This stops the accuracy monitoring and dismisses any calibration dialog.
+   * This stops the accuracy monitoring.
    *
    * @returns Promise that resolves when monitoring stops
    * @since 8.2.0

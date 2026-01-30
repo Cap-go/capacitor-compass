@@ -35,8 +35,6 @@ public class CapgoCompass implements SensorEventListener {
     // Accuracy monitoring
     private AccuracyCallback accuracyCallback;
     private volatile int currentAccuracy = -1; // -1 = UNKNOWN
-    private int requiredAccuracy = 3; // Default to HIGH
-    private boolean hasShownDialog = false;
 
     // Background thread for sensor processing
     private HandlerThread sensorThread;
@@ -82,10 +80,6 @@ public class CapgoCompass implements SensorEventListener {
 
     public int getCurrentAccuracy() {
         return this.currentAccuracy;
-    }
-
-    public void setRequiredAccuracy(int accuracy) {
-        this.requiredAccuracy = accuracy;
     }
 
     /**

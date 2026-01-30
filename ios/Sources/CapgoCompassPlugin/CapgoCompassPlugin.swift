@@ -140,13 +140,13 @@ public class CapgoCompassPlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     @objc func watchAccuracy(_ call: CAPPluginCall) {
-        // No-op on iOS - compass accuracy monitoring not needed
+        // No-op on iOS - compass accuracy monitoring not available
         // iOS automatically calibrates compass since iPhone 5S
         call.resolve()
     }
 
     @objc func unwatchAccuracy(_ call: CAPPluginCall) {
-        // No-op on iOS - compass accuracy monitoring not needed
+        // No-op on iOS - compass accuracy monitoring not available
         call.resolve()
     }
 
