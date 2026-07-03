@@ -4,7 +4,7 @@ import pkg from './package.json';
 
 const config: CapacitorConfig = {
   appId: 'app.capgo.compass',
-  appName: 'Compass Example',
+  appName: '@capgo/capacitor-compass',
   webDir: 'dist',
   plugins: {
     SplashScreen: {
