@@ -7,7 +7,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.display.DisplayManager;
 import android.os.Handler;
-import android.os.HandlerThread;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
@@ -37,8 +37,6 @@ public class CapgoCompass implements SensorEventListener {
     private AccuracyCallback accuracyCallback;
     private volatile int currentAccuracy = -1; // -1 = UNKNOWN
 
-    // Background thread for sensor processing
-    private HandlerThread sensorThread;
     private Handler sensorHandler;
 
     // Throttling state
@@ -93,33 +91,65 @@ public class CapgoCompass implements SensorEventListener {
         this.minHeadingChange = minHeadingChange > 0 ? minHeadingChange : DEFAULT_MIN_HEADING_CHANGE;
     }
 
-    public void registerListeners() {
-        // Create background thread for sensor processing
-        sensorThread = new HandlerThread("CompassSensorThread");
-        sensorThread.start();
-        sensorHandler = new Handler(sensorThread.getLooper());
+    /**
+     * Register sensor listeners on the main thread looper.
+     *
+     * @return true when listeners were registered, false when registration cannot proceed
+     */
+    public boolean registerListeners() {
+        if (sensorHandler != null) {
+            return true;
+        }
+
+        if (sensorManager == null) {
+            Log.e(TAG, "SensorManager is not available");
+            return false;
+        }
+
+        if (magnetometer == null && accelerometer == null) {
+            Log.e(TAG, "No compass sensors available on this device");
+            return false;
+        }
+
+        Looper mainLooper = Looper.getMainLooper();
+        if (mainLooper == null) {
+            Log.e(TAG, "Main looper is not available");
+            return false;
+        }
+
+        sensorHandler = new Handler(mainLooper);
 
         // Reset throttling state
         lastNotifyTime = 0;
         lastNotifiedHeading = -1;
 
-        if (this.magnetometer != null) {
-            this.sensorManager.registerListener(this, this.magnetometer, SensorManager.SENSOR_DELAY_NORMAL, sensorHandler);
-        }
-        if (this.accelerometer != null) {
-            this.sensorManager.registerListener(this, this.accelerometer, SensorManager.SENSOR_DELAY_NORMAL, sensorHandler);
+        try {
+            boolean registered = false;
+            if (magnetometer != null) {
+                registered = sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_NORMAL, sensorHandler);
+            }
+            if (accelerometer != null) {
+                registered =
+                    sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL, sensorHandler) || registered;
+            }
+            if (!registered) {
+                unregisterListeners();
+                Log.e(TAG, "Failed to register sensor listeners");
+                return false;
+            }
+            return true;
+        } catch (RuntimeException e) {
+            unregisterListeners();
+            Log.e(TAG, "Failed to register sensor listeners", e);
+            return false;
         }
     }
 
     public void unregisterListeners() {
-        this.sensorManager.unregisterListener(this);
-
-        // Clean up background thread
-        if (sensorThread != null) {
-            sensorThread.quitSafely();
-            sensorThread = null;
-            sensorHandler = null;
+        if (sensorManager != null) {
+            sensorManager.unregisterListener(this);
         }
+        sensorHandler = null;
     }
 
     private DisplayRotation getDisplayRotation() {

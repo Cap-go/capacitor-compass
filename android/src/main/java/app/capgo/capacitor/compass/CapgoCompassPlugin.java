@@ -1,5 +1,6 @@
 package app.capgo.capacitor.compass;
 
+import android.util.Log;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -23,7 +24,9 @@ public class CapgoCompassPlugin extends Plugin {
     public void handleOnResume() {
         super.handleOnResume();
         if (this.implementation != null && isListening) {
-            this.implementation.registerListeners();
+            if (!this.implementation.registerListeners()) {
+                Log.e("CapgoCompassPlugin", "Failed to re-register compass sensor listeners on resume");
+            }
         }
     }
 
@@ -75,7 +78,12 @@ public class CapgoCompassPlugin extends Plugin {
             notifyListeners("headingChange", ret);
         });
 
-        implementation.registerListeners();
+        if (!implementation.registerListeners()) {
+            isListening = false;
+            implementation.setHeadingCallback(null);
+            call.reject("Failed to register compass sensor listeners");
+            return;
+        }
         call.resolve();
     }
 
