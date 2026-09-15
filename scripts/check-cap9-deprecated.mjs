@@ -47,6 +47,7 @@ const RULES = [
     id: "saveCall",
     pattern: /\bsaveCall\s*\(/,
     exts: [".java", ".kt", ".swift"],
+    ignoreLine: /bridge\??\.saveCall\s*\(/,
   },
   {
     id: "getSavedCall",
@@ -62,6 +63,7 @@ const RULES = [
     id: "releaseCall",
     pattern: /\breleaseCall\s*\(/,
     exts: [".java", ".kt", ".swift"],
+    ignoreLine: /bridge\??\.releaseCall\s*\(/,
   },
   {
     id: "pluginRequestPermission",
@@ -215,7 +217,7 @@ if (!cap.android && !cap.ios) {
   process.exit(0);
 }
 
-const scanRoots = collectScanRoots(pluginDir, cap);
+const scanRoots = collectScanRoots(pluginDir, pkg);
 const allExts = [...new Set(RULES.flatMap((r) => r.exts))];
 const files = [];
 for (const root of scanRoots) {
