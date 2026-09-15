@@ -110,16 +110,16 @@ public class CapgoCompassPlugin: CAPPlugin, CAPBridgedPlugin {
         if status == .notDetermined {
             // Store call ID and request permission
             permissionCallId = call.callbackId
+            call.keepAlive = true
             implementation.requestPermission { [weak self] in
                 guard let self = self else { return }
                 if let callId = self.permissionCallId,
                    let savedCall = self.bridge?.savedCall(withID: callId) {
                     savedCall.resolve(["compass": self.currentPermissionState()])
-                    self.bridge?.releaseCall(savedCall)
+                    savedCall.keepAlive = false
                     self.permissionCallId = nil
                 }
             }
-            bridge?.saveCall(call)
         } else {
             call.resolve(["compass": currentPermissionState()])
         }
