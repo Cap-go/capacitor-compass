@@ -1,12 +1,27 @@
 # @capgo/capacitor-compass
-<a href="https://capgo.app/"><img src="https://capgo.app/readme-banner.svg?repo=Cap-go/capacitor-compass" alt="Capgo - Instant updates for Capacitor" /></a>
+
+Get the device compass heading in degrees on iOS and Android, as a one-off reading or a live stream. Point users toward a place, rotate a map or build a qibla finder.
+
+<a href="https://capgo.app/?ref=plugin_compass"><img src="https://capgo.app/readme-banner.svg?repo=Cap-go/capacitor-compass" alt="Capgo - Instant updates for Capacitor" /></a>
 
 <div align="center">
-  <h2><a href="https://capgo.app/?ref=plugin_compass"> ➡️ Get Instant updates for your App with Capgo</a></h2>
-  <h2><a href="https://capgo.app/consulting/?ref=plugin_compass"> Missing a feature? We'll build the plugin for you 💪</a></h2>
+  <p><b>Capgo</b>: open-source live updates for Ionic and Capacitor apps. Ship OTA fixes and features instantly, without waiting for app store review.</p>
+  <h2><a href="https://capgo.app/register/?ref=plugin_compass">➡️ Get started for free</a></h2>
+  <p>14-day unlimited free trial. No credit card required</p>
+  <p><a href="https://capgo.app/consulting/?ref=plugin_compass">Missing a feature? We'll build the plugin for you 💪</a></p>
 </div>
 
-Native compass heading plugin for Capacitor.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Cap-go/capacitor-compass/main/assets/github-social-preview.png" alt="@capgo/capacitor-compass for Capacitor apps" width="300" />
+</p>
+
+## Key features
+
+- **Current heading**: `getCurrentHeading()` returns the heading in degrees.
+- **Live updates**: `startListening()` emits `headingChange` events, `stopListening()` stops them.
+- **Accuracy**: `watchAccuracy()`, `getAccuracy()` and the `accuracyChange` event so you can ask users to calibrate.
+- **Permissions**: `checkPermissions()` and `requestPermissions()`.
+- **Platforms**: iOS and Android. iOS uses Core Location heading, Android uses the device sensors. Not available on web.
 
 ## Why Capacitor Compass?
 
